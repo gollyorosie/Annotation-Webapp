@@ -1,0 +1,103 @@
+<!-- THIS IS YOUR PLANT CSS -->
+
+	p {
+		margin: 0;
+	}
+		
+	ul, ul li {
+		list-style: none;
+	}
+	
+	.wrap {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+	.annotator-ready, .scanner-ready {
+		margin-top: 20px;
+	}
+	.intro-graph {
+		margin: 10px 0;
+	}
+	.annotator-ready p {
+		margin-top: 10px;
+	}
+	.scanner-ready, .manual-ready {
+		display: none;
+		margin-bottom: 20px;
+	}
+
+	.labels {
+		margin-top: 20px;
+	}
+	.label {
+		width: 240px;
+		height: 0.8in;
+		border: 3px double #000;
+		padding: 2px 10px;
+		display: inline-block;	
+		clear: both;
+		float: left;
+		/*margin-top: 80px;*/
+		font-family:'Conv_Californian FB Bold',Serif;
+		margin-left: 5px;
+ /*  -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);*/
+    margin-bottom: -20px;
+    margin-top: -10px;
+		
+	}
+
+	.manual-generate {
+		margin-bottom: 10px;
+	}
+
+	.labels-manual {
+		margin-top: 0px;
+		padding-top: 0px;
+		min-height: 1200px;
+	}
+	
+	.label .facility {
+		text-align: center;
+		font-variant: small-caps;
+		font-weight: bold;
+		font-size: 1.2em;
+		font-size: 1.2rem;
+		margin: 2px 0 0 0;
+	}
+	.label .species {
+		text-align: left;
+		margin:  5px 0 0 0;
+		font-size: 1rem;
+		font-size: 1em;
+	}
+	.label .sn {
+		
+		font-size: 1rem;
+		font-size: 1em;
+		font-family:'Conv_Californian FB Italic',Serif;
+		font-weight: bold
+	}
+	.label .a {
+		font-size: .9rem;
+		font-size: .9em;
+	}
+	
+	.label .annotator {
+		clear: both;
+		margin: 6.5px 0 0 0;
+		font-size: .8rem;
+		font-size: .8em;
+	}
+	.label .date {
+		float: right;
+		font-weight: bold;
+		font-size: .9rem;
+		font-size: .9em;
+	}
+	#barcode-input {
+		margin-bottom: 10px;
+	}
