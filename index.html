@@ -1,0 +1,209 @@
+<html>
+
+<head>
+
+	<link rel="stylesheet" href="fonts.css" type="text/css" charset="utf-8" />
+	<link rel="stylesheet" href="herbarium.css" type="text/css" charset="utf-8" />
+	
+
+	
+<!-- this is jquery, used to get and parse the data.  We will modify it based on the data location -->
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="printThis.js"></script>
+
+
+
+	
+   <script type="text/javascript">
+
+//
+// $('#element').donetyping(callback[, timeout=1000])
+// Fires callback when a user has finished typing. This is determined by the time elapsed
+// since the last keystroke and timeout parameter or the blur event--whichever comes first.
+//   @callback: function to be called when even triggers
+//   @timeout:  (default=1000) timeout, in ms, to to wait before triggering event if not
+//              caused by blur.
+// Requires jQuery 1.7+
+//
+;(function($){
+    $.fn.extend({
+        donetyping: function(callback,timeout){
+            timeout = timeout || 1e3; // 1 second default timeout
+            var timeoutReference,
+                doneTyping = function(el){
+                    if (!timeoutReference) return;
+                    timeoutReference = null;
+                    callback.call(el);
+                };
+            return this.each(function(i,el){
+                var $el = $(el);
+                // Chrome Fix (Use keyup over keypress to detect backspace)
+                // thank you @palerdot
+                $el.is(':input') && $el.on('keyup keypress',function(e){
+                    // This catches the backspace button in chrome, but also prevents
+                    // the event from triggering too premptively. Without this line,
+                    // using tab/shift+tab will make the focused element fire the callback.
+                    if (e.type=='keyup' && e.keyCode!=8) return;
+
+                    // Check if timeout has been set. If it has, "reset" the clock and
+                    // start over again.
+                    if (timeoutReference) clearTimeout(timeoutReference);
+                    timeoutReference = setTimeout(function(){
+                        // if we made it here, our timeout has elapsed. Fire the
+                        // callback
+                        doneTyping(el);
+                    }, timeout);
+                }).on('blur',function(){
+                    // If we can, fire the event since we're leaving the field
+                    doneTyping(el);
+                });
+            });
+        }
+    });
+})(jQuery);
+
+
+
+
+	$(document).on("click", ".print-button", function() {
+		$('.labels, .labels-manual').printThis();
+		$('.labels-manual').printThis();
+		//$('.labels-manual').html('');
+				if (($('.sn').text().length) > "40") {
+			$('.sn').css('font-size', '12px');
+		};
+
+	});
+
+	
+	$(document).on("click", ".save-annotator", function() {
+		//get values from form
+		var annotator = $('#annotator').val();
+		var annotatorType = $('.annotator-type').val();
+		var entryType = $("#typeDiv input[type='radio']:checked").val();
+
+		$('.annotator-ready').hide();
+		//generate and format date
+			var d = new Date();
+
+			var day = d.getDate();
+			var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec" ];
+			var month = monthNames[d.getMonth()]
+	
+			var dateOutput =  day +' '+ month +' '+ d.getFullYear();
+		
+
+		
+		if (entryType == "scanner") {
+			$('.scanner-ready').show();
+			$("#barcode-input").focus();
+			
+				
+			$('#barcode-input').donetyping(function(){
+			
+	
+			// get data from scanner. modern usb scanners act as keyboards, so we are simply collecting the input value from a form field
+			var data = $('#barcode-input').val();
+			var datajson = JSON.parse(data);
+			
+			
+
+			$('.labels').append('<div class="label"><p class="facility">Pringle Herbarium</p><p class="species"><span class="sn">'+ datajson.g +'&nbsp;'+ datajson.s+' </span><span class="a">'+ datajson.a +'</a></span></p><p class="annotator">'+annotatorType+': '+annotator + '<span class="date"> '+dateOutput +'</span></p></div>');
+		  	
+			
+	 			/*reduce font size if more than 35 characters in species & authority info */
+				$('#barcode-input').val("");
+				$("#barcode-input").focus();
+				if (($('.species').text().length) > "35") {
+					$('.species').css('font-size', '12px');
+				};
+				if (($('.sn').text().length) > "45") {
+					$('.sn').css('font-size', '12px');
+				};
+				
+			});	
+
+		}
+
+		if (entryType == "manual") {
+			$('.manual-ready').show();
+		}
+
+
+		$(document).on("click", ".manual-generate", function() {
+			var facility = $('#facility').val();			
+			var genusSpecies = $('#genus-species').val();
+			var authority = $('#authority').val();
+
+		$('.labels-manual').append('<div class="label"><p class="facility">'+facility+'</p><p class="species"><span class="sn">'+ genusSpecies +'</span><span class="a">&nbsp;&nbsp;'+ authority +'</a></p><p class="annotator">'+annotatorType+': '+annotator + '<span class="date"> '+dateOutput +'</span></p></div>');	
+			
+		$('#genus-species').val('');
+		$('#authority').val('');	
+		});	
+
+
+	});
+   </script>
+
+<!-- Page title.  Not super important -->
+	<title>Barcode Scanner Specimen Reader</title>
+
+</head>
+
+<body>
+	<div class="wrap">
+		<h2>Specimen Barcode Reader / Label Generator</h2>
+		<p>This program allows you to enter programs in one of the following ways; i.) Scan bar-code or ii.) Type species name.  </p>
+
+		<div class="annotator-ready">
+			<p class="intro-graph">Enter your credentials as they should appear on the label: </p>
+			<input type="text" id="annotator" placeholder="Enter name">
+			<select name="annotator-type" class="annotator-type">
+				<option value="Annot">Annotator</option>
+				<option value="Det">Determiner</option>
+			</select>
+
+			<p class="scanner-graph">How will you enter your information? </p>
+			<div id="typeDiv">
+				<input type="radio" name="entry-type" value="scanner">Scan bar codes<br>
+				<input type="radio" name="entry-type" value="manual">Type species names
+			</div>
+
+
+			
+			<button class="save-annotator">Get started</button>
+		</div>
+
+
+	<div class="scanner-ready">
+		<p class="intro-graph">Scan your specimen code when ready. When you have scanned all your labels, click Ready to Print.</p>
+		<input type="text" id="barcode-input" name="barcode-input" value=""/>
+
+
+		<button class="print-button">Ready to Print</button>
+		<div class="labels"></div>
+	</div>
+
+	<div class="manual-ready">
+		<p class="intro-graph">Enter your specimen data below, then click the Generate Label button. When you're ready to print, click the Print button.</p>
+		
+
+
+		
+		<div class="manual-labels">
+			<input type="text" id="facility" value="Pringle Herbarium" placeholder="Pringle Herbarium" style="width:300px;"><br />
+			<input type="text" id="genus-species" placeholder="Enter genus and species" style="width:300px;"><br />
+			<input type="text" id="authority" placeholder="Enter authority" style="width:300px;">
+
+		</div>
+		<button class="manual-generate"> Generate label</button>
+		<button class="print-button">Ready to Print</button>
+		<div class="labels-manual"></div>
+	</div>
+
+	</div>
+	
+</div>
+</body>
+
+</html>
